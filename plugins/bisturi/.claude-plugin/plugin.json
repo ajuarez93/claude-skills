@@ -1,0 +1,10 @@
+{
+  "name": "bisturi",
+  "version": "0.2.0",
+  "description": "Disciplina de código preciso y económico: declarar supuestos, escribir lo mínimo, cambios quirúrgicos, verificar y acotar la salida de comandos.",
+  "author": { "name": "Alfonso Juarez", "url": "https://github.com/ajuarez93" },
+  "homepage": "https://github.com/ajuarez93/claude-skills",
+  "repository": "https://github.com/ajuarez93/claude-skills",
+  "license": "MIT",
+  "keywords": ["coding-discipline", "tokens", "guardrails"]
+}

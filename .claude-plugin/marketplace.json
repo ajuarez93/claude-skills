@@ -1,0 +1,17 @@
+{
+  "name": "claude-skills",
+  "description": "Skills y comandos de Claude Code hechos y usados en proyectos reales.",
+  "owner": { "name": "Alfonso Juarez", "url": "https://github.com/ajuarez93" },
+  "plugins": [
+    {
+      "name": "bisturi",
+      "source": "./plugins/bisturi",
+      "description": "Skill de disciplina de código: supuestos explícitos, mínimo código, cambios quirúrgicos, verificación y salida acotada."
+    },
+    {
+      "name": "cochinito",
+      "source": "./plugins/cochinito",
+      "description": "Comando /cochinito:cochinito, auditoría de tokens que primero propone y luego cambia con tu visto bueno. Trae el hook opcional token-filter."
+    }
+  ]
+}

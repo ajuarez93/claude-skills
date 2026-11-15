@@ -1,53 +1,60 @@
 # Claude Skills
 
-A small, growing collection of [Claude Code](https://claude.com/claude-code) Skills and slash commands, built while working on real production projects. Each one exists because it earned its place in daily use, not as a demo.
+A small, growing collection of [Claude Code](https://claude.com/claude-code) skills and slash commands, built while working on real production projects. Each one exists because it earned its place in daily use, not as a demo.
+
+This repo is a **plugin marketplace**: each tool is its own plugin, so you install only what you want.
 
 **Contributions welcome.** Found a way to improve one of these, or want to propose a new one? Open a PR or an issue.
 
-## What's a Skill vs. a Command?
+## Plugins
 
-Both extend Claude Code, but they trigger differently:
-
-- **Skills** (`skills/<name>/SKILL.md`) load automatically when Claude recognizes that the task matches the skill's description. Good for standing guardrails and workflows that should apply whenever they're relevant.
-- **Commands** (`commands/<name>.md`) are explicit: you type `/<name>` to run them. Good for a deliberate, on-demand audit.
-
-## Available Skills
-
-| Skill | What it does |
+| Plugin | What it does |
 |---|---|
-| [bisturi](skills/bisturi/) | *(the scalpel; formerly `preciso-economico`)* Coding discipline for changes of real scope: state assumptions, write the minimum, touch only what the task needs, define how it will be verified, check every caller before changing shared behavior, and keep command output bounded. Skips trivial work on purpose. |
+| [bisturi](plugins/bisturi/) | *(the scalpel; formerly `preciso-economico`)* A skill with coding discipline for changes of real scope: state assumptions, write the minimum, touch only what the task needs, define how it will be verified, check every caller before changing shared behavior, and keep command output bounded. Skips trivial work on purpose. |
+| [cochinito](plugins/cochinito/) | *(the piggy bank; formerly `ahorra-tokens`)* A command that audits a project's token consumption: default model and effort, CLAUDE.md existence/size/freshness, global vs. project permission hygiene, command-output habits and session habits. **Reports and proposes first; changes nothing without your OK**, and deleting from global settings needs its own confirmation. Ships an optional hook, `token-filter.py`, that truncates huge Bash output (keeps the first 120 and last 60 lines; fail-open). The hook is **not** registered automatically. |
 
-> Skills that work with [Orquestra](https://orquestra.me) live in their own repo: [orquestra-skills](https://github.com/ajuarez93/orquestra-skills) (`orquestra-spec`).
+Skills that work with [Orquestra](https://orquestra.me) live in their own repo: [orquestra-skills](https://github.com/ajuarez93/orquestra-skills).
 
-## Available Commands
+## Install as a plugin (recommended)
 
-| Command | What it does |
-|---|---|
-| [cochinito](commands/cochinito.md) | *(the piggy bank; formerly `ahorra-tokens`)* Audits a project's token consumption: default model and effort, CLAUDE.md existence/size/freshness, an output-truncating hook, global vs. project permission hygiene, command-output habits and session habits. **Reports and proposes first; changes nothing without your OK**, and deleting from global settings needs its own confirmation. |
+```bash
+claude plugin marketplace add ajuarez93/claude-skills
+claude plugin install bisturi@claude-skills
+claude plugin install cochinito@claude-skills
+```
 
-## Hooks
+Or inside a session: `/plugin marketplace add ajuarez93/claude-skills`, then `/plugin install bisturi@claude-skills`.
 
-| Hook | What it does |
-|---|---|
-| [token-filter.py](hooks/token-filter.py) | PostToolUse hook for `Bash`: when a command prints more than ~200 lines or ~30k characters, keeps the first 120 and last 60 lines and says what was cut. Fail-open: on any error the original output passes through. Used by `cochinito`. |
+- `bisturi` loads itself when the task fits its description.
+- Run the audit with `/cochinito:cochinito` (plugin commands are prefixed with the plugin name).
+- Third-party marketplaces don't auto-update by default: run `claude plugin update bisturi@claude-skills`, or enable auto-update.
 
-## Installation
+## Install by hand
+
+If you prefer plain files (the commands are then un-prefixed, e.g. `/cochinito`):
 
 ```bash
 git clone https://github.com/ajuarez93/claude-skills.git
 cd claude-skills
 
-# Skills (global; for one project use <project>/.claude/skills/ instead)
-cp -r skills/bisturi ~/.claude/skills/
+# Skill (global; for one project use <project>/.claude/skills/)
+cp -r plugins/bisturi/skills/bisturi ~/.claude/skills/
 
 # Command
-cp commands/cochinito.md ~/.claude/commands/
-
-# Hook (optional, `cochinito` can set it up for you)
-mkdir -p ~/.claude/hooks && cp hooks/token-filter.py ~/.claude/hooks/
+cp plugins/cochinito/commands/cochinito.md ~/.claude/commands/
 ```
 
-To register the hook, add it to `~/.claude/settings.json`:
+To keep them up to date, symlink instead of copying.
+
+## The optional hook
+
+`cochinito` can set it up for you. By hand:
+
+```bash
+mkdir -p ~/.claude/hooks && cp plugins/cochinito/hooks/token-filter.py ~/.claude/hooks/
+```
+
+and register it in `~/.claude/settings.json`:
 
 ```json
 {
@@ -59,7 +66,7 @@ To register the hook, add it to `~/.claude/settings.json`:
 }
 ```
 
-Then work normally (`bisturi` loads itself when the task fits), or run `/cochinito` for the audit. To stay up to date, symlink instead of copying.
+Trade-off: a failure in the middle of a very long output gets cut; re-run narrowed with `grep`, `head` or `tail` when something looks missing.
 
 ### Renamed
 

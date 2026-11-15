@@ -1,0 +1,10 @@
+{
+  "name": "cochinito",
+  "version": "0.2.0",
+  "description": "Auditoría de consumo de tokens del proyecto: modelo, CLAUDE.md, permisos, hábitos de salida y de sesión. Primero propone, no cambia nada sin tu visto bueno. Incluye un hook opcional que trunca salidas enormes de Bash.",
+  "author": { "name": "Alfonso Juarez", "url": "https://github.com/ajuarez93" },
+  "homepage": "https://github.com/ajuarez93/claude-skills",
+  "repository": "https://github.com/ajuarez93/claude-skills",
+  "license": "MIT",
+  "keywords": ["tokens", "audit", "hooks"]
+}
