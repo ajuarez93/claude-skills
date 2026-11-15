@@ -16,7 +16,8 @@ Both extend Claude Code, but they trigger differently:
 | Skill | What it does |
 |---|---|
 | [bisturi](skills/bisturi/) | *(the scalpel; formerly `preciso-economico`)* Coding discipline for changes of real scope: state assumptions, write the minimum, touch only what the task needs, define how it will be verified, check every caller before changing shared behavior, and keep command output bounded. Skips trivial work on purpose. |
-| [orquestra-spec](skills/orquestra-spec/) | **Works with [Orquestra](https://orquestra.me)** and needs its MCP server (`npx orquestra-mcp setup`). A spec with acceptance criteria *before* building a big task, recorded inside Orquestra: a pre-verdict on the idea, the spec as a doc, a cold review by a subagent that has none of your context, your approval, and then a task created with checklist and per-criterion verifications. Also has a `drift` mode that checks a doc against the real code. In Spanish, since Orquestra is. |
+
+> Skills that work with [Orquestra](https://orquestra.me) live in their own repo: [orquestra-skills](https://github.com/ajuarez93/orquestra-skills) (`orquestra-spec`).
 
 ## Available Commands
 
@@ -38,7 +39,6 @@ cd claude-skills
 
 # Skills (global; for one project use <project>/.claude/skills/ instead)
 cp -r skills/bisturi ~/.claude/skills/
-cp -r skills/orquestra-spec ~/.claude/skills/   # only if you use Orquestra
 
 # Command
 cp commands/cochinito.md ~/.claude/commands/
@@ -59,7 +59,7 @@ To register the hook, add it to `~/.claude/settings.json`:
 }
 ```
 
-Then work normally (`bisturi` and `orquestra-spec` load themselves when the task fits), or run `/cochinito` for the audit. To stay up to date, symlink instead of copying.
+Then work normally (`bisturi` loads itself when the task fits), or run `/cochinito` for the audit. To stay up to date, symlink instead of copying.
 
 ### Renamed
 
