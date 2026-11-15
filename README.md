@@ -6,54 +6,64 @@ A small, growing collection of [Claude Code](https://claude.com/claude-code) Ski
 
 ## What's a Skill vs. a Command?
 
-Both are ways to extend Claude Code, but they trigger differently:
+Both extend Claude Code, but they trigger differently:
 
-- **Skills** (`skills/<name>/SKILL.md`) are loaded automatically when Claude recognizes the task matches the skill's description — no explicit invocation needed. Good for standing guardrails/conventions that should apply whenever they're relevant.
-- **Commands** (`commands/<name>.md`) are explicit — you type `/<name>` to run them. Good for a deliberate, on-demand audit or workflow you want to trigger yourself.
+- **Skills** (`skills/<name>/SKILL.md`) load automatically when Claude recognizes that the task matches the skill's description. Good for standing guardrails and workflows that should apply whenever they're relevant.
+- **Commands** (`commands/<name>.md`) are explicit: you type `/<name>` to run them. Good for a deliberate, on-demand audit.
 
 ## Available Skills
 
-| Skill | Description |
+| Skill | What it does |
 |---|---|
-| [preciso-economico](skills/preciso-economico/) | Coding-discipline and token-economy guardrails for any non-trivial implementation, review, or refactor task — surface assumptions instead of guessing, avoid overengineering, keep edits surgical, define verifiable success criteria, and bound tool output/context growth. |
+| [bisturi](skills/bisturi/) | *(the scalpel; formerly `preciso-economico`)* Coding discipline for changes of real scope: state assumptions, write the minimum, touch only what the task needs, define how it will be verified, check every caller before changing shared behavior, and keep command output bounded. Skips trivial work on purpose. |
+| [orquestra-spec](skills/orquestra-spec/) | **Works with [Orquestra](https://orquestra.me)** and needs its MCP server (`npx orquestra-mcp setup`). A spec with acceptance criteria *before* building a big task, recorded inside Orquestra: a pre-verdict on the idea, the spec as a doc, a cold review by a subagent that has none of your context, your approval, and then a task created with checklist and per-criterion verifications. Also has a `drift` mode that checks a doc against the real code. In Spanish, since Orquestra is. |
 
 ## Available Commands
 
-| Command | Description |
+| Command | What it does |
 |---|---|
-| [ahorra-tokens](commands/ahorra-tokens.md) | Audits and optimizes a project's token consumption end to end: default model, CLAUDE.md existence/size/freshness, an output-truncating hook for noisy Bash commands, project vs. global permission hygiene, and session habits (when to `/clear`/`/compact`/`/model`, TodoWrite discipline). Creates what's missing directly; only asks before deleting anything from the global `~/.claude/settings.json`. |
+| [cochinito](commands/cochinito.md) | *(the piggy bank; formerly `ahorra-tokens`)* Audits a project's token consumption: default model and effort, CLAUDE.md existence/size/freshness, an output-truncating hook, global vs. project permission hygiene, command-output habits and session habits. **Reports and proposes first; changes nothing without your OK**, and deleting from global settings needs its own confirmation. |
+
+## Hooks
+
+| Hook | What it does |
+|---|---|
+| [token-filter.py](hooks/token-filter.py) | PostToolUse hook for `Bash`: when a command prints more than ~200 lines or ~30k characters, keeps the first 120 and last 60 lines and says what was cut. Fail-open: on any error the original output passes through. Used by `cochinito`. |
 
 ## Installation
 
-### Skills
-
-```bash
-# Global (all your projects)
-cp -r skills/preciso-economico ~/.claude/skills/
-
-# Project-only
-cp -r skills/preciso-economico /path/to/your/project/.claude/skills/
-```
-
-### Commands
-
-```bash
-# Global (all your projects)
-cp commands/ahorra-tokens.md ~/.claude/commands/
-
-# Project-only
-cp commands/ahorra-tokens.md /path/to/your/project/.claude/commands/
-```
-
-Then, inside Claude Code, run `/ahorra-tokens` to trigger the command manually, or just work normally — `preciso-economico` loads itself when the task fits.
-
-### Via git (to stay up to date)
-
 ```bash
 git clone https://github.com/ajuarez93/claude-skills.git
-ln -s "$(pwd)/claude-skills/skills/preciso-economico" ~/.claude/skills/preciso-economico
-ln -s "$(pwd)/claude-skills/commands/ahorra-tokens.md" ~/.claude/commands/ahorra-tokens.md
+cd claude-skills
+
+# Skills (global; for one project use <project>/.claude/skills/ instead)
+cp -r skills/bisturi ~/.claude/skills/
+cp -r skills/orquestra-spec ~/.claude/skills/   # only if you use Orquestra
+
+# Command
+cp commands/cochinito.md ~/.claude/commands/
+
+# Hook (optional, `cochinito` can set it up for you)
+mkdir -p ~/.claude/hooks && cp hooks/token-filter.py ~/.claude/hooks/
 ```
+
+To register the hook, add it to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "python3 \"$HOME/.claude/hooks/token-filter.py\"", "timeout": 10 }] }
+    ]
+  }
+}
+```
+
+Then work normally (`bisturi` and `orquestra-spec` load themselves when the task fits), or run `/cochinito` for the audit. To stay up to date, symlink instead of copying.
+
+### Renamed
+
+`preciso-economico` is now **`bisturi`** and `ahorra-tokens` is now **`cochinito`**. If you installed the old names, remove them and install the new ones.
 
 ## License
 
